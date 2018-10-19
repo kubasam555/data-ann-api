@@ -85,17 +85,17 @@ def create_json_response(image_url, image_id, user_id):
 def chat_request(request):
     if 'user' in request.GET and not 'image' in request.GET:
         qs: ImageRef = ImageRef.objects.filter(user_id__isnull=True).first()
-        json_response = create_json_response(qs.image.url, qs.image_id, request.GET['userId'])
+        json_response = create_json_response(qs.image_url, qs.id, request.GET['userId'])
     elif 'user' in request.GET and 'image' in request.GET and 'label' in request.GET:
 
         image_id = request.GET['image']
         user_id = request.GET['user']
         label = request.GET['label']
-        instance = ImageRef.objects.get(image_id=image_id)
+        instance = ImageRef.objects.get(id=image_id)
         instance.user_id = user_id
         instance.label = label
         instance.save()
-        json_response = create_json_response(instance.image.url, instance.image_id, user_id)
+        json_response = create_json_response(instance.image_url, instance.id, user_id)
     else:
         return HttpResponse(json.dumps({'error': 'Missing parameters'}), status=400)
     return HttpResponse(json.dumps(json_response),
