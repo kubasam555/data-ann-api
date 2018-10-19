@@ -1,6 +1,9 @@
 import json
 
 from django.conf import settings
+from django.core import serializers
+from django.core.serializers.json import DjangoJSONEncoder
+from django.forms import model_to_dict
 from django.shortcuts import render
 from app.models import ImageRef
 
@@ -69,7 +72,7 @@ def create_json_response(image_url, image_id, user_id):
                   "title":"Not a car"
                 },
                 {
-                  "url": f'{settings.BACKEND_URL}/image/?image={image_id}&label=unlabeled&messenger+user+id={user_id}',
+                  "url": f'{settings.BACKEND_URL}/image/?image={image_id}&label=unlabeled&messenger+user+id',
                   "type":"json_plugin_url",
                   "title":"I can't decide"
                 }
@@ -112,3 +115,8 @@ def chat_request(request):
                         content_type="application/json")
 
 
+def list_labels(request):
+    queryset = ImageRef.objects.filter(label__isnull=False)
+    raw_data = serializers.serialize('python', queryset, fields=('image_url', 'label'))
+    actual_data = [d['fields'] for d in raw_data]
+    return HttpResponse(json.dumps(actual_data), content_type="application/json")

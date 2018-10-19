@@ -130,7 +130,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
-BACKEND_URL = 'https://data-ann-api.herokuapp.com'
+BACKEND_URL = os.environ.get('BACKEND_URL', 'https://data-ann-api.herokuapp.com')
 
 django_heroku.settings(locals())
 

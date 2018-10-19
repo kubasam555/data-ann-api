@@ -18,9 +18,10 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from app.views import chat_request
+from app.views import chat_request, list_labels
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('image/', chat_request)
+    path('image/', chat_request),
+    path('labels-list/', list_labels)
 ]
