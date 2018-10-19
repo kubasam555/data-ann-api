@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = ')f*vp-5i44iu989x$pqx*3k^fb8!-7!_ryvpt#cv5vp)9q_rdw'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', True)
 
 ALLOWED_HOSTS = '*'
 
@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app'
+    'app',
+    'cloudinary'
 ]
 
 MIDDLEWARE = [
@@ -135,3 +136,11 @@ BACKEND_URL = 'https://data-ann-api.herokuapp.com'
 django_heroku.settings(locals())
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+IMAGES_DROPBOX_URL = 'https://api.cloudinary.com/v1_1/dejwvxabh/resources/image?max_results=2000'
+
+
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY')
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
+CLOUDINARY_URL = f'https://{CLOUDINARY_API_KEY}:{CLOUDINARY_API_SECRET}@api.cloudinary.com/v1_1/{CLOUDINARY_CLOUD_NAME}/resources/image?max_results=2000'

@@ -59,17 +59,17 @@ def create_json_response(image_url, image_id, user_id):
               "text": "Is it a car or not?",
               "buttons": [
                 {
-                  "url": f'{settings.BACKEND_URL}/image/?image={image_id}&label=car&user={user_id}',
+                  "url": f'{settings.BACKEND_URL}/image/?image={image_id}&label=car&messenger+user+id={user_id}',
                   "type":"json_plugin_url",
                   "title":"Car"
                 },
                 {
-                  "url": f'{settings.BACKEND_URL}/image/?image={image_id}&label=not_car&user={user_id}',
+                  "url": f'{settings.BACKEND_URL}/image/?image={image_id}&label=not_car&messenger+user+id={user_id}',
                   "type":"json_plugin_url",
                   "title":"Not a car"
                 },
                 {
-                  "url": f'{settings.BACKEND_URL}/image/?image={image_id}&label=unlabeled&user={user_id}',
+                  "url": f'{settings.BACKEND_URL}/image/?image={image_id}&label=unlabeled&messenger+user+id={user_id}',
                   "type":"json_plugin_url",
                   "title":"I can't decide"
                 }
@@ -84,19 +84,24 @@ def create_json_response(image_url, image_id, user_id):
 
 def chat_request(request):
     if 'messenger user id' in request.GET and not 'image' in request.GET:
-        qs: ImageRef = ImageRef.objects.filter(user_id__isnull=True).first()
-        json_response = create_json_response(qs.image_url, qs.id, request.GET['messenger user id'])
+        instance: ImageRef = ImageRef.objects.filter(user_id__isnull=True).first()
+        if not instance:
+            return HttpResponse(json.dumps({"messages": [{"text": "Missing images ;("}]}), status=400)
+        json_response = create_json_response(instance.image_url, instance.id, request.GET['messenger user id'])
     elif 'messenger user id' in request.GET and 'image' in request.GET and 'label' in request.GET:
 
         image_id = request.GET['image']
         user_id = request.GET['messenger user id']
         label = request.GET['label']
         instance = ImageRef.objects.get(id=image_id)
-        # TODO:
-        # instance.user_id = user_id
+        instance.user_id = user_id
         instance.label = label
         instance.save()
-        json_response = create_json_response(instance.image_url, instance.id, user_id)
+        new_instance: ImageRef = ImageRef.objects.filter(
+            user_id__isnull=True).first()
+        if not instance:
+            return HttpResponse(json.dumps({"messages": [{"text": "Missing images ;("}]}), status=400)
+        json_response = create_json_response(new_instance.image_url, new_instance.id, user_id)
     else:
         return HttpResponse(json.dumps({'error': 'Missing parameters'}), status=400)
     return HttpResponse(json.dumps(json_response),
