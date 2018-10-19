@@ -93,7 +93,11 @@ def chat_request(request):
         image_id = request.GET['image']
         user_id = request.GET['messenger user id']
         label = request.GET['label']
-        instance = ImageRef.objects.get(id=image_id)
+        try:
+            instance = ImageRef.objects.get(id=image_id)
+        except ImageRef.DoesNotExist:
+            return HttpResponse(
+                json.dumps({"messages": [{"text": "Missing images ;("}]}), status=400)
         instance.user_id = user_id
         instance.label = label
         instance.save()
