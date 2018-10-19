@@ -1,15 +1,11 @@
-import cloudinary
 import requests
 from django.conf import settings
 from django.contrib import admin
 
-# Register your models here.
 from django.http import HttpResponseRedirect
 from django.urls import path
 
 from app.models import ImageRef
-
-# admin.site.register(ImageRef)
 
 
 @admin.register(ImageRef)
