@@ -47,7 +47,7 @@ def create_json_response(image_url, image_id, user_id):
           "attachment": {
             "type": "image",
             "payload": {
-              "url": f'{settings.BACKEND_URL}{image_url}'
+              "url": image_url
             }
           }
         },
@@ -85,14 +85,15 @@ def create_json_response(image_url, image_id, user_id):
 def chat_request(request):
     if 'user' in request.GET and not 'image' in request.GET:
         qs: ImageRef = ImageRef.objects.filter(user_id__isnull=True).first()
-        json_response = create_json_response(qs.image_url, qs.id, request.GET['userId'])
+        json_response = create_json_response(qs.image_url, qs.id, request.GET['user'])
     elif 'user' in request.GET and 'image' in request.GET and 'label' in request.GET:
 
         image_id = request.GET['image']
         user_id = request.GET['user']
         label = request.GET['label']
         instance = ImageRef.objects.get(id=image_id)
-        instance.user_id = user_id
+        # TODO:
+        # instance.user_id = user_id
         instance.label = label
         instance.save()
         json_response = create_json_response(instance.image_url, instance.id, user_id)
